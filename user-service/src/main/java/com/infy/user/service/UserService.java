@@ -22,7 +22,8 @@ public interface UserService {
 
     void forgotPassword(Long userId, String newPassword);
 
-     UserResponseDTO getUserById(Long userId);
+    UserResponseDTO getUserById(Long userId);
+    List<UserResponseDTO> getUserByIds(List<Long> userId);
 
     List<UserResponseDTO> getAllUsers();
 

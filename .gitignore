@@ -36,5 +36,6 @@ backend_out.json
 restore-directory.js
 scan-directory.js
 
-
+output/
+dir/
 .env

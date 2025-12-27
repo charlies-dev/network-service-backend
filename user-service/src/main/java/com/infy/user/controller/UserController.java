@@ -76,6 +76,12 @@ public class UserController {
         List<UserResponseDTO> users = userService.searchUsersByName(name);
         return ResponseEntity.ok(users);
     }
+    @PostMapping("/ids")
+    public ResponseEntity<List<UserResponseDTO>> getUsersByIds(
+            @RequestBody List<Long> userIds) {
+        List<UserResponseDTO> users = userService.getUserByIds(userIds);
+        return ResponseEntity.ok(users);
+    }
 
     @PostMapping("/{userId}/details")
     public ResponseEntity<String> addUserDetails(
