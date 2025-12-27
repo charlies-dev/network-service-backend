@@ -1,7 +1,6 @@
 package com.infy.user.dto;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import com.infy.user.enums.EmploymentType;
 

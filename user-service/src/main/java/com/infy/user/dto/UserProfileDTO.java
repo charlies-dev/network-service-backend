@@ -1,7 +1,5 @@
 package com.infy.user.dto;
 
-import java.time.LocalDateTime;
-
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
