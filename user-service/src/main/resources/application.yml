@@ -1,0 +1,15 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: user-service 
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+
+      discovery:
+        hostname: localhost
+        enabled: true
+        register: true

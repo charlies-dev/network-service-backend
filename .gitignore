@@ -39,3 +39,8 @@ scan-directory.js
 output/
 dir/
 .env
+
+.rawFiles/
+
+**/upload/**
+**/uploads/**

@@ -7,12 +7,12 @@ import org.springframework.stereotype.Service;
 
 import com.infy.user.dto.request.UserProfileRequestDTO;
 import com.infy.user.dto.request.UserProfileResponseDTO;
-import com.infy.user.dto.request.UserProfileUpdateDTO;
 import com.infy.user.entity.User;
 import com.infy.user.entity.UserProfile;
 import com.infy.user.exception.InfyLinkedInException;
 import com.infy.user.repository.UserProfileRepository;
 import com.infy.user.repository.UserRepository;
+import com.infy.user.util.UserProfileImageUploadUtil;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -24,24 +24,29 @@ public class UserProfileServiceImpl implements UserProfileService {
     private final UserRepository userRepository;
     private final UserProfileRepository userProfileRepository;
     private final ModelMapper modelMapper;
+    private final UserProfileImageUploadUtil imageUploadUtil;
 
     /* ================= ADD PROFILE ================= */
 
     @Override
     @Transactional
-    public Long addUserProfile(Long userId, UserProfileRequestDTO requestDTO) {
+    public Long addUserProfile( UserProfileRequestDTO requestDTO) {
 
-        User user = userRepository.findById(userId)
+        User user = userRepository.findById(requestDTO.getUserId())
                 .orElseThrow(() ->
                         new InfyLinkedInException("User not found"));
 
-        if (userProfileRepository.existsByUserId(userId)) {
+        if (userProfileRepository.existsByUserId(requestDTO.getUserId())) {
             throw new InfyLinkedInException("User profile already exists");
         }
 
         UserProfile profile = modelMapper.map(requestDTO, UserProfile.class);
         profile.setUser(user);
         profile.setCreatedAt(LocalDateTime.now());
+
+        String imageUrl =
+                imageUploadUtil.uploadProfileImage(requestDTO.getProfilePhoto());
+        profile.setProfilePhotoUrl(imageUrl);
 
         return userProfileRepository.save(profile).getId();
     }
@@ -52,7 +57,7 @@ public class UserProfileServiceImpl implements UserProfileService {
     @Transactional
     public void updateUserProfileDetails(
             Long profileId,
-            UserProfileUpdateDTO requestDTO) {
+            UserProfileRequestDTO requestDTO) {
 
         UserProfile profile = userProfileRepository.findById(profileId)
                 .orElseThrow(() ->
@@ -79,9 +84,11 @@ public class UserProfileServiceImpl implements UserProfileService {
         if (requestDTO.getCountry() != null)
             profile.setCountry(requestDTO.getCountry());
 
-        if (requestDTO.getProfilePhotoUrl() != null)
-            profile.setProfilePhotoUrl(requestDTO.getProfilePhotoUrl());
-
+       if (requestDTO.getProfilePhoto() != null) {
+            String imageUrl =
+                    imageUploadUtil.uploadProfileImage(requestDTO.getProfilePhoto());
+            profile.setProfilePhotoUrl(imageUrl);
+        }
         if (requestDTO.getProfileCompleted() != null)
             profile.setProfileCompleted(requestDTO.getProfileCompleted());
 

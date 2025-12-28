@@ -1,0 +1,15 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: content-service 
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+
+      discovery:
+        hostname: localhost
+        enabled: true
+        register: true

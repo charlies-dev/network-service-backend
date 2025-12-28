@@ -1,0 +1,75 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gateway-service
+
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery:
+        enabled: true
+        register: true
+        
+    
+    gateway:
+      discovery:
+        locator:
+          enabled: false
+
+      routes:
+
+        - id: auth
+          uri: lb://user-service
+          predicates:
+            - Path=/auth/**,/uploads/user-profile/**
+
+        # USER SERVICE
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=
+                /users/**,
+                /skills/**,
+                /experiences/**,
+                /education/**,
+                /user-profile/**
+                
+          filters:
+            - JwtAuthenticationFilter
+
+        # CONTENT SERVICE
+        - id: content-service
+          uri: lb://content-service
+          predicates:
+            - Path=
+                /posts/**,
+                /interactions/**,
+                /notifications/**
+          filters:
+            - JwtAuthenticationFilter          
+
+        # NETWORK SERVICE
+       
+        - id: network-service
+          uri: lb://network-service
+          predicates:
+            - Path=
+                /connections/**,
+                /connection-groups/**
+          filters:
+            - JwtAuthenticationFilter
+        
+        # RECRUITMENT SERVICE
+        - id: recruitment-service
+          uri: lb://recruitment-service
+          predicates:
+            - Path=
+                /jobs/**,
+                /job-applications/**,
+                /companies/**
+                /uploads/**
+          filters:
+            - JwtAuthenticationFilter

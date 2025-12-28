@@ -20,7 +20,7 @@ public class UserClient {
         try {
             webClientBuilder.build()
                     .get()
-                    .uri("http://localhost:8080/users/{id}", userId)
+                    .uri("http://user-service/users/{id}", userId)
                     .retrieve()
                     .toBodilessEntity()
                     .block();
@@ -33,7 +33,7 @@ public class UserClient {
         try {
             return webClientBuilder.build()
                     .post()
-                    .uri("http://localhost:8080/users/ids")
+                    .uri("http://user-service/users/ids")
                     .bodyValue(userIds)
                     .retrieve()
                     .bodyToFlux(UserResponseDTO.class) 
@@ -47,7 +47,7 @@ public class UserClient {
         try {
             return webClientBuilder.build()
                     .get()
-                    .uri("http://localhost:8080/users/{id}", userId)
+                    .uri("http://user-service/users/{id}", userId)
                     .retrieve()
                     .bodyToMono(UserResponseDTO.class) 
                 
