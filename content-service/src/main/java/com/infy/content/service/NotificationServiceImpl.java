@@ -1,5 +1,12 @@
 package com.infy.content.service;
 
+import java.time.LocalDateTime;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
 import com.infy.content.dto.request.NotificationCreateRequestDTO;
 import com.infy.content.dto.response.NotificationResponseDTO;
 import com.infy.content.entity.Notification;
@@ -9,15 +16,6 @@ import com.infy.content.repository.NotificationRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-
-import org.springframework.stereotype.Service;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
-import java.time.LocalDateTime;
-import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
