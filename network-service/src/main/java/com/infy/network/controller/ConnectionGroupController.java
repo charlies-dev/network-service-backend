@@ -29,8 +29,6 @@ public class ConnectionGroupController {
 
     private final ConnectionGroupService connectionGroupService;
 
-    /* ================= CREATE GROUP ================= */
-
     @PostMapping
     public ResponseEntity<ConnectionGroupResponseDTO> createGroup(
             @Valid @RequestBody ConnectionGroupRequestDTO requestDTO) {
@@ -39,8 +37,6 @@ public class ConnectionGroupController {
                 connectionGroupService.createNewGroup(requestDTO)
         );
     }
-
-    /* ================= UPDATE GROUP ================= */
 
     @PutMapping("/{groupId}")
     public ResponseEntity<ConnectionGroupResponseDTO> updateGroup(
@@ -52,8 +48,6 @@ public class ConnectionGroupController {
         );
     }
 
-    /* ================= ADD MEMBERS ================= */
-
     @PostMapping("/members")
     public ResponseEntity<Void> addGroupMembers(
             @Valid @RequestBody AddGroupMembersRequestDTO requestDTO) {
@@ -61,8 +55,6 @@ public class ConnectionGroupController {
         connectionGroupService.addGroupsMember(requestDTO);
         return ResponseEntity.noContent().build();
     }
-
-    /* ================= GET GROUPS BY USER ================= */
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<ConnectionGroupResponseDTO>> getGroupsByUser(
@@ -73,8 +65,6 @@ public class ConnectionGroupController {
         );
     }
 
-    /* ================= GET GROUP MEMBERS ================= */
-
     @GetMapping("/{groupId}/members")
     public ResponseEntity<List<UserDetailsDTO>> getGroupMembers(
             @PathVariable Long groupId) {
@@ -83,8 +73,6 @@ public class ConnectionGroupController {
                 connectionGroupService.getGroupsMembersByGroupId(groupId)
         );
     }
-
-    /* ================= REMOVE GROUP MEMBERS ================= */
 
     @DeleteMapping("/{groupId}/members")
     public ResponseEntity<Void> removeGroupMembers(
@@ -95,8 +83,6 @@ public class ConnectionGroupController {
         return ResponseEntity.noContent().build();
     }
 
-    /* ================= DELETE GROUP ================= */
-
     @DeleteMapping("/{groupId}")
     public ResponseEntity<Void> deleteGroup(
             @PathVariable Long groupId,
@@ -106,4 +92,3 @@ public class ConnectionGroupController {
         return ResponseEntity.noContent().build();
     }
 }
-

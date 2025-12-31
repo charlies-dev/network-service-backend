@@ -26,6 +26,8 @@ public class UserClient {
                     .toBodilessEntity()
                     .block();
         } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+
             throw new InfyLinkedInException("User does not exist");
         }
     }
@@ -34,13 +36,15 @@ public class UserClient {
         try {
             return webClientBuilder.build()
                     .post()
-                    .uri("http://user-service/users/ids")
+                     .uri("http://user-service/users/ids")
                     .bodyValue(userIds)
                     .retrieve()
                     .bodyToFlux(UserResponseDTO.class)
                     .collectList()
                     .block();
         } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+
             throw new InfyLinkedInException("Unable to fetch user name");
         }
     }
@@ -55,6 +59,8 @@ public class UserClient {
 
                     .block();
         } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+
             throw new InfyLinkedInException("Unable to fetch user name");
         }
     }
@@ -63,7 +69,7 @@ public class UserClient {
         try {
             UserResponseDTO userEntity = webClientBuilder.build()
                     .get()
-                    .uri("http://user-service/users/{id}", userId)
+                      .uri("http://user-service/users/{id}", userId)
                     .retrieve()
                     .bodyToMono(UserResponseDTO.class)
 
@@ -78,6 +84,7 @@ public class UserClient {
             return user;
 
         } catch (Exception ex) {
+            System.out.println(ex.getMessage());
             throw new InfyLinkedInException("Unable to fetch user name");
         }
     }

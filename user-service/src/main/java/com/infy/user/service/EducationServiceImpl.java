@@ -1,7 +1,12 @@
 package com.infy.user.service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Service;
+
 import com.infy.user.dto.request.EducationRequestDTO;
-import com.infy.user.dto.request.EducationUpdateDTO;
 import com.infy.user.dto.response.EducationResponseDTO;
 import com.infy.user.entity.Education;
 import com.infy.user.entity.User;
@@ -12,12 +17,6 @@ import com.infy.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.stereotype.Service;
-import org.modelmapper.ModelMapper;
-
-import java.time.LocalDateTime;
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -26,8 +25,6 @@ public class EducationServiceImpl implements EducationService {
     private final EducationRepository educationRepository;
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
-
-    /* ================= ADD EDUCATION ================= */
 
     @Override
     @Transactional
@@ -73,11 +70,9 @@ public class EducationServiceImpl implements EducationService {
                 .toList();
     }
 
-    /* ================= UPDATE EDUCATION ================= */
-
     @Override
     @Transactional
-    public void updateEducationDetails(Long educationId, EducationUpdateDTO requestDTO) {
+    public void updateEducationDetails(Long educationId, EducationRequestDTO requestDTO) {
 
         Education education = educationRepository.findById(educationId)
                 .orElseThrow(() -> new InfyLinkedInException("Education record not found"));
@@ -101,8 +96,6 @@ public class EducationServiceImpl implements EducationService {
         education.setUpdatedAt(LocalDateTime.now());
     }
 
-    /* ================= REMOVE EDUCATION ================= */
-
     @Override
     @Transactional
     public void removeEducation(Long educationId) {
@@ -112,8 +105,6 @@ public class EducationServiceImpl implements EducationService {
 
         educationRepository.delete(education);
     }
-
-    /* ================= GET EDUCATION BY USER ================= */
 
     @Override
     public List<EducationResponseDTO> getEducationDetailByUserId(Long userId) {
@@ -132,8 +123,6 @@ public class EducationServiceImpl implements EducationService {
                 .map(edu -> modelMapper.map(edu, EducationResponseDTO.class))
                 .toList();
     }
-
-    /* ================= GET EDUCATION BY ID ================= */
 
     @Override
     public EducationResponseDTO getEducationDetailById(Long educationId) {

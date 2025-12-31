@@ -5,18 +5,16 @@ import org.springframework.web.multipart.MultipartFile;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-
 @Data
 public class JobApplicationRequestDTO {
-    @NotNull
+    @NotNull(message = "{job.application.jobId.notnull}")
     private Long jobId;
 
-    @NotNull
+    @NotNull(message = "{job.application.userId.notnull}")
     private Long userId;
 
-    /* Files */
     @NotNull
-    private MultipartFile resume;          // required for apply
+    private MultipartFile resume;          
 
-    private MultipartFile coverLetter;     // optional
+    private MultipartFile coverLetter;     
 }

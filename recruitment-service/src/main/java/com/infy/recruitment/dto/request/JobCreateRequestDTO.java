@@ -12,10 +12,10 @@ import lombok.Data;
 @Data
 public class JobCreateRequestDTO {
 
-    @NotNull
+    @NotNull(message = "{job.companyId.notnull}")
     private Long companyId;
 
-    @NotBlank
+    @NotBlank(message = "{job.title.notblank}")
     private String title;
 
     private String description;
@@ -28,11 +28,10 @@ public class JobCreateRequestDTO {
 
     private String location;
 
-    @NotNull
+    @NotNull(message = "{job.jobType.notnull}")
     private JobType jobType;
 
-    @NotNull
-    @Future
+    @NotNull(message = "{job.applicationDeadline.notnull}")
+    @Future(message = "{job.applicationDeadline.future}")
     private LocalDate applicationDeadline;
 }
-

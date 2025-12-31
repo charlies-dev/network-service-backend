@@ -31,7 +31,6 @@ public class Notification {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /** Receiver user (User Service reference) */
     @Column(name = "user_id", nullable = false)
     private Long userId;
 

@@ -15,5 +15,3 @@ public class ConnectionResponseDTO {
     private ConnectionStatus status;
     private LocalDateTime createdAt;
 }
-
-

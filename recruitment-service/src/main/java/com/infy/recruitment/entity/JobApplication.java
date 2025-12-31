@@ -1,7 +1,5 @@
 package com.infy.recruitment.entity;
 
-
-
 import java.time.LocalDateTime;
 
 import com.infy.recruitment.enums.ApplicationStatus;
@@ -36,13 +34,10 @@ public class JobApplication {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /* ================= Relationships ================= */
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "job_id", nullable = false)
     private Job job;
 
-    /** Applicant (User Service reference) */
     @Column(name = "user_id", nullable = false)
     private Long userId;
 

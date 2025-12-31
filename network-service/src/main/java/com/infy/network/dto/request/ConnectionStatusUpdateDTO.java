@@ -8,6 +8,6 @@ import lombok.Data;
 @Data
 public class ConnectionStatusUpdateDTO {
 
-    @NotNull
+    @NotNull(message = "{connection.status.notnull}")
     private ConnectionStatus status;
 }

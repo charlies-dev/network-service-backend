@@ -18,6 +18,8 @@ public interface JobService {
 
     void removeJob(Long jobId);
 
+    JobResponseDTO getJobByJobId(Long jobId);
+
     List<JobResponseDTO> getJobByCompanyId(Long companyId);
 
     List<JobResponseDTO> getJobByIds(List<Long> jobIds);
@@ -26,4 +28,6 @@ public interface JobService {
             JobSearchRequestDTO requestDTO,
             Pageable pageable
     );
+
+    List<JobResponseDTO> getActiveJobs();
 }

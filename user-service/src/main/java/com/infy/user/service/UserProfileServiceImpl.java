@@ -4,9 +4,10 @@ import java.time.LocalDateTime;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.infy.user.dto.request.UserProfileRequestDTO;
-import com.infy.user.dto.request.UserProfileResponseDTO;
+import com.infy.user.dto.response.UserProfileResponseDTO;
 import com.infy.user.entity.User;
 import com.infy.user.entity.UserProfile;
 import com.infy.user.exception.InfyLinkedInException;
@@ -26,15 +27,12 @@ public class UserProfileServiceImpl implements UserProfileService {
     private final ModelMapper modelMapper;
     private final UserProfileImageUploadUtil imageUploadUtil;
 
-    /* ================= ADD PROFILE ================= */
-
     @Override
     @Transactional
-    public Long addUserProfile( UserProfileRequestDTO requestDTO) {
+    public Long addUserProfile(UserProfileRequestDTO requestDTO) {
 
         User user = userRepository.findById(requestDTO.getUserId())
-                .orElseThrow(() ->
-                        new InfyLinkedInException("User not found"));
+                .orElseThrow(() -> new InfyLinkedInException("User not found"));
 
         if (userProfileRepository.existsByUserId(requestDTO.getUserId())) {
             throw new InfyLinkedInException("User profile already exists");
@@ -44,14 +42,8 @@ public class UserProfileServiceImpl implements UserProfileService {
         profile.setUser(user);
         profile.setCreatedAt(LocalDateTime.now());
 
-        String imageUrl =
-                imageUploadUtil.uploadProfileImage(requestDTO.getProfilePhoto());
-        profile.setProfilePhotoUrl(imageUrl);
-
         return userProfileRepository.save(profile).getId();
     }
-
-    /* ================= UPDATE PROFILE ================= */
 
     @Override
     @Transactional
@@ -60,8 +52,7 @@ public class UserProfileServiceImpl implements UserProfileService {
             UserProfileRequestDTO requestDTO) {
 
         UserProfile profile = userProfileRepository.findById(profileId)
-                .orElseThrow(() ->
-                        new InfyLinkedInException("User profile not found"));
+                .orElseThrow(() -> new InfyLinkedInException("User profile not found"));
 
         if (requestDTO.getHeadline() != null)
             profile.setHeadline(requestDTO.getHeadline());
@@ -84,51 +75,61 @@ public class UserProfileServiceImpl implements UserProfileService {
         if (requestDTO.getCountry() != null)
             profile.setCountry(requestDTO.getCountry());
 
-       if (requestDTO.getProfilePhoto() != null) {
-            String imageUrl =
-                    imageUploadUtil.uploadProfileImage(requestDTO.getProfilePhoto());
-            profile.setProfilePhotoUrl(imageUrl);
-        }
         if (requestDTO.getProfileCompleted() != null)
             profile.setProfileCompleted(requestDTO.getProfileCompleted());
 
         profile.setUpdatedAt(LocalDateTime.now());
     }
 
-    /* ================= REMOVE PROFILE ================= */
-
     @Override
     @Transactional
     public void removeUserProfile(Long profileId) {
 
         UserProfile profile = userProfileRepository.findById(profileId)
-                .orElseThrow(() ->
-                        new InfyLinkedInException("User profile not found"));
+                .orElseThrow(() -> new InfyLinkedInException("User profile not found"));
 
         userProfileRepository.delete(profile);
     }
-
-    /* ================= GET BY USER ================= */
 
     @Override
     public UserProfileResponseDTO getUserProfileDetailByUserId(Long userId) {
 
         UserProfile profile = userProfileRepository.findByUserId(userId)
-                .orElseThrow(() ->
-                        new InfyLinkedInException("User profile not found"));
+                .orElseThrow(() -> new InfyLinkedInException("User profile not found"));
 
         return modelMapper.map(profile, UserProfileResponseDTO.class);
     }
-
-    /* ================= GET BY ID ================= */
 
     @Override
     public UserProfileResponseDTO getUserProfileDetailById(Long profileId) {
 
         UserProfile profile = userProfileRepository.findById(profileId)
-                .orElseThrow(() ->
-                        new InfyLinkedInException("User profile not found"));
+                .orElseThrow(() -> new InfyLinkedInException("User profile not found"));
 
         return modelMapper.map(profile, UserProfileResponseDTO.class);
     }
+
+    @Override
+    @Transactional
+    public String updateProfileImage(Long userId, MultipartFile profileImage) {
+
+        if (profileImage == null || profileImage.isEmpty()) {
+            throw new InfyLinkedInException("Profile image is required");
+        }
+
+        if (!profileImage.getContentType().startsWith("image/")) {
+            throw new InfyLinkedInException("Only image files are allowed");
+        }
+
+        UserProfile profile = userProfileRepository.findByUserId(userId)
+                .orElseThrow(() -> new InfyLinkedInException("User profile not found"));
+
+        String imageUrl = imageUploadUtil.uploadProfileImage(profileImage);
+
+        profile.setProfilePhotoUrl(imageUrl);
+        profile.setUpdatedAt(LocalDateTime.now());
+
+        return imageUrl;
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.infy.user.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,11 +48,11 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/{userId}/forgot-password")
+    @PutMapping("/{userId}/forgot-password")
     public ResponseEntity<Void> forgotPassword(
             @PathVariable Long userId,
-            @RequestParam String newPassword) {
-        userService.forgotPassword(userId, newPassword);
+            @RequestBody Map<String,String> newPassword) {
+        userService.forgotPassword(userId, newPassword.get("password"));
         return ResponseEntity.noContent().build();
     }
 
@@ -65,8 +66,9 @@ public class UserController {
 
     @GetMapping
     @PermitAll
-    public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
-        List<UserResponseDTO> users = userService.getAllUsers();
+    public ResponseEntity<List<UserResponseDTO>> getAllUsers(
+            @RequestParam(required = false) Integer limit) {
+        List<UserResponseDTO> users = userService.getAllUsers(limit);
         return ResponseEntity.ok(users);
     }
 
@@ -76,6 +78,7 @@ public class UserController {
         List<UserResponseDTO> users = userService.searchUsersByName(name);
         return ResponseEntity.ok(users);
     }
+
     @PostMapping("/ids")
     public ResponseEntity<List<UserResponseDTO>> getUsersByIds(
             @RequestBody List<Long> userIds) {
@@ -90,4 +93,5 @@ public class UserController {
         String response = userService.addUserDetails(userId, requestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
 }

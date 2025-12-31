@@ -5,7 +5,6 @@ import java.util.List;
 import com.infy.user.dto.EducationDTO;
 import com.infy.user.dto.UserExperienceDTO;
 import com.infy.user.dto.UserProfileDTO;
-import com.infy.user.dto.UserSkillDTO;
 
 import lombok.Data;
 
@@ -18,5 +17,5 @@ public class UserDetailsRequestDTO {
 
     private List<UserExperienceDTO> experiences;
 
-    private List<UserSkillDTO> userSkills;
+    private List<String> userSkills;
 }

@@ -2,7 +2,6 @@ package com.infy.user.dto;
 
 import java.time.LocalDate;
 
-
 import lombok.Data;
 
 @Data
@@ -25,8 +24,5 @@ public class UserDTO {
 
     private LocalDate createdAt;
 
-    private LocalDate updatedAt;
-
-
-    
+    private LocalDate updatedAt;    
 }

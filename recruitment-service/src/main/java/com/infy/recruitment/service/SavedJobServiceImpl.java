@@ -25,8 +25,6 @@ public class SavedJobServiceImpl implements SavedJobService {
     private final JobRepository jobRepository;
     private final UserClient userClient;
 
-    /* ================= SAVE JOB ================= */
-
     @Override
     @Transactional
     public void saveJob(SavedJobRequestDTO dto) {
@@ -50,8 +48,6 @@ public class SavedJobServiceImpl implements SavedJobService {
         savedJobRepository.save(savedJob);
     }
 
-    /* ================= REMOVE SAVED JOB ================= */
-
     @Override
     @Transactional
     public void removeSavedJob(Long userId, Long jobId) {
@@ -63,8 +59,6 @@ public class SavedJobServiceImpl implements SavedJobService {
 
         savedJobRepository.delete(savedJob);
     }
-
-    /* ================= GET SAVED JOBS ================= */
 
     @Override
     public List<SavedJobResponseDTO> getSavedJobByUserId(Long userId) {

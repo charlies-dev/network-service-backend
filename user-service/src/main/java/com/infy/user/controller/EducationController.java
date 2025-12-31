@@ -12,9 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.infy.user.dto.request.EducationListRequestDTO;
 import com.infy.user.dto.request.EducationRequestDTO;
-import com.infy.user.dto.request.EducationUpdateDTO;
 import com.infy.user.dto.response.EducationResponseDTO;
 import com.infy.user.service.EducationService;
 
@@ -39,18 +37,18 @@ public class EducationController {
     @PostMapping("/user/{userId}/bulk")
     public ResponseEntity<List<Long>> addEducations(
             @PathVariable Long userId,
-            @Valid @RequestBody EducationListRequestDTO requestDTO) {
+            @Valid @RequestBody List<EducationRequestDTO> requestDTO) {
 
         return ResponseEntity.ok(
                 educationService.addUserEducations(
                         userId,
-                        requestDTO.getEducations()));
+                        requestDTO));
     }
 
     @PutMapping("/{educationId}")
     public ResponseEntity<Void> updateEducation(
             @PathVariable Long educationId,
-            @RequestBody EducationUpdateDTO requestDTO) {
+            @RequestBody EducationRequestDTO requestDTO) {
 
         educationService.updateEducationDetails(educationId, requestDTO);
         return ResponseEntity.noContent().build();

@@ -1,7 +1,12 @@
 package com.infy.user.service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Service;
+
 import com.infy.user.dto.request.UserExperienceRequestDTO;
-import com.infy.user.dto.request.UserExperienceUpdateDTO;
 import com.infy.user.dto.response.UserExperienceResponseDTO;
 import com.infy.user.entity.User;
 import com.infy.user.entity.UserExperience;
@@ -12,12 +17,6 @@ import com.infy.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.stereotype.Service;
-import org.modelmapper.ModelMapper;
-
-import java.time.LocalDateTime;
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class UserExperienceServiceImpl implements UserExperienceService {
@@ -25,8 +24,6 @@ public class UserExperienceServiceImpl implements UserExperienceService {
     private final UserExperienceRepository experienceRepository;
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
-
-    /* ================= ADD SINGLE EXPERIENCE ================= */
 
     @Override
     @Transactional
@@ -45,8 +42,6 @@ public class UserExperienceServiceImpl implements UserExperienceService {
         return experienceRepository.save(experience).getId();
     }
 
-    /* ================= ADD MULTIPLE EXPERIENCES ================= */
-
     @Override
     @Transactional
     public List<Long> addUserExperiences(
@@ -63,8 +58,7 @@ public class UserExperienceServiceImpl implements UserExperienceService {
 
         List<UserExperience> experiences = requestDTOs.stream()
                 .map(dto -> {
-                    UserExperience exp =
-                            modelMapper.map(dto, UserExperience.class);
+                    UserExperience exp = modelMapper.map(dto, UserExperience.class);
                     exp.setUser(user);
                     exp.setCreatedAt(LocalDateTime.now());
                     return exp;
@@ -77,13 +71,11 @@ public class UserExperienceServiceImpl implements UserExperienceService {
                 .toList();
     }
 
-    /* ================= UPDATE EXPERIENCE ================= */
-
     @Override
     @Transactional
     public void updateUserExperienceDetails(
             Long experienceId,
-            UserExperienceUpdateDTO requestDTO) {
+            UserExperienceRequestDTO requestDTO) {
 
         UserExperience experience = experienceRepository.findById(experienceId)
                 .orElseThrow(() ->
@@ -116,8 +108,6 @@ public class UserExperienceServiceImpl implements UserExperienceService {
         experience.setUpdatedAt(LocalDateTime.now());
     }
 
-    /* ================= REMOVE EXPERIENCE ================= */
-
     @Override
     @Transactional
     public void removeUserExperience(Long experienceId) {
@@ -128,8 +118,6 @@ public class UserExperienceServiceImpl implements UserExperienceService {
 
         experienceRepository.delete(experience);
     }
-
-    /* ================= GET BY USER ================= */
 
     @Override
     public List<UserExperienceResponseDTO> getUserExperienceDetailByUserId(Long userId) {
@@ -149,8 +137,6 @@ public class UserExperienceServiceImpl implements UserExperienceService {
                 .map(exp -> modelMapper.map(exp, UserExperienceResponseDTO.class))
                 .toList();
     }
-
-    /* ================= GET BY ID ================= */
 
     @Override
     public UserExperienceResponseDTO getUserExperienceDetailById(Long experienceId) {

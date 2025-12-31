@@ -23,4 +23,3 @@ public class JobResponseDTO {
     private LocalDate applicationDeadline;
     private LocalDateTime createdAt;
 }
-

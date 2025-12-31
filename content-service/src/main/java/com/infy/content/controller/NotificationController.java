@@ -25,8 +25,6 @@ public class NotificationController {
 
     private final NotificationService notificationService;
 
-    /* ================= GET BY USER ================= */
-
     @GetMapping("/user/{userId}")
     public ResponseEntity<Page<NotificationResponseDTO>> getByUser(
             @PathVariable Long userId,
@@ -36,8 +34,6 @@ public class NotificationController {
                 notificationService.getNotificationByUserId(userId, pageable)
         );
     }
-
-    /* ================= GET BY USER + TYPE ================= */
 
     @GetMapping("/user/{userId}/type/{type}")
     public ResponseEntity<Page<NotificationResponseDTO>> getByUserAndType(
@@ -51,8 +47,6 @@ public class NotificationController {
         );
     }
 
-    /* ================= GET BY USER + READ ================= */
-
     @GetMapping("/user/{userId}/read/{isRead}")
     public ResponseEntity<Page<NotificationResponseDTO>> getByUserAndRead(
             @PathVariable Long userId,
@@ -65,8 +59,6 @@ public class NotificationController {
         );
     }
 
-    /* ================= GET BY ID ================= */
-
     @GetMapping("/{notificationId}")
     public ResponseEntity<NotificationResponseDTO> getById(
             @PathVariable Long notificationId) {
@@ -77,9 +69,6 @@ public class NotificationController {
         );
     }
 
-    
-    /* ================= ADD NOTIFICATION ================= */
-
     @PostMapping
     public ResponseEntity<Long> addNotification(
             @Valid @RequestBody NotificationCreateRequestDTO dto) {
@@ -88,8 +77,6 @@ public class NotificationController {
                 notificationService.addNotification(dto)
         );
     }
-
-    /* ================= UNREAD COUNT ================= */
 
     @GetMapping("/user/{userId}/unread-count")
     public ResponseEntity<Long> getUnreadCount(

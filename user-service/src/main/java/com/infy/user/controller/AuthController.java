@@ -49,7 +49,15 @@ public class AuthController {
     public ResponseEntity<ApiResponse> registerUser(@Valid @RequestBody UserRegisterRequestDTO request) {
 
         Long id = userService.registerUser(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse("success", id));
+
+        Authentication authentication = authenticationManager
+                .authenticate(new UsernamePasswordAuthenticationToken(request.getEmailId(), request.getPassword()));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        String jwt = jwtUtils.generateTokenForUser(authentication);
+        LinkedInUserDetails userDetails = (LinkedInUserDetails) authentication.getPrincipal();
+        JwtResponse jwtResponse = new JwtResponse(userDetails.getId(), jwt);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse("success", jwtResponse));
 
     }
 }

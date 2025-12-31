@@ -23,8 +23,6 @@ public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
     private final ModelMapper modelMapper;
 
-    /* ================= GET BY USER ================= */
-
     @Override
     public Page<NotificationResponseDTO> getNotificationByUserId(
             Long userId,
@@ -37,8 +35,6 @@ public class NotificationServiceImpl implements NotificationService {
                 n -> modelMapper.map(n, NotificationResponseDTO.class)
         );
     }
-
-    /* ================= GET BY USER + TYPE ================= */
 
     @Override
     public Page<NotificationResponseDTO> getNotificationByUserIdAndType(
@@ -55,8 +51,6 @@ public class NotificationServiceImpl implements NotificationService {
         );
     }
 
-    /* ================= GET BY USER + READ STATUS ================= */
-
     @Override
     public Page<NotificationResponseDTO> getNotificationByUserIdAndIsRead(
             Long userId,
@@ -72,8 +66,6 @@ public class NotificationServiceImpl implements NotificationService {
         );
     }
 
-    /* ================= GET BY ID (MARK AS READ) ================= */
-
     @Override
     @Transactional
     public NotificationResponseDTO getNotificationByNotificationId(
@@ -85,7 +77,6 @@ public class NotificationServiceImpl implements NotificationService {
                                 new InfyLinkedInException(
                                         "Notification not found"));
 
-        // Mark as read
         if (!notification.getIsRead()) {
             notification.setIsRead(true);
         }
@@ -110,8 +101,6 @@ public class NotificationServiceImpl implements NotificationService {
 
         return notificationRepository.save(notification).getId();
     }
-
-    /* ================= UNREAD COUNT ================= */
 
     @Override
     public Long getUnreadNotificationCount(Long userId) {

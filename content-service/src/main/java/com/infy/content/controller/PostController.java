@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.infy.content.dto.request.PostCreateRequestDTO;
 import com.infy.content.dto.request.PostStatusUpdateDTO;
 import com.infy.content.dto.request.PostUpdateRequestDTO;
+import com.infy.content.dto.response.PostCountDTO;
 import com.infy.content.dto.response.PostResponseDTO;
+import com.infy.content.dto.response.UserStatsDTO;
 import com.infy.content.service.PostService;
 
 import jakarta.validation.Valid;
@@ -78,5 +80,31 @@ public class PostController {
         postService.deletePostById(postId);
         return ResponseEntity.noContent().build();
     }
-}
 
+    @GetMapping("/count/{userId}")
+    public ResponseEntity<PostCountDTO> getPostCount(
+            @PathVariable Long userId) {
+
+        return ResponseEntity.ok(
+                postService.getPostCount(userId)
+        );
+    }
+
+    @GetMapping("/stats/{userId}")
+    public ResponseEntity<UserStatsDTO> getUserStats(
+            @PathVariable Long userId) {
+
+        return ResponseEntity.ok(
+                postService.getUserStats(userId)
+        );
+    }
+
+    @GetMapping("/feed/{userId}")
+    public ResponseEntity<List<PostResponseDTO>> getConnectedUsersPosts(
+            @PathVariable Long userId) {
+
+        return ResponseEntity.ok(
+                postService.getConnectedUsersPosts(userId)
+        );
+    }
+}

@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.infy.network.dto.request.ConnectionRequestDTO;
 import com.infy.network.dto.request.ConnectionStatusUpdateDTO;
+import com.infy.network.dto.response.ConnectionCountDTO;
 import com.infy.network.dto.response.ConnectionResponseDTO;
+import com.infy.network.dto.response.ConnectionStatusDTO;
 import com.infy.network.service.ConnectionService;
 
 import jakarta.validation.Valid;
@@ -44,7 +46,7 @@ public class ConnectionController {
         connectionService.updateConnectionRequestStatus(connectionId, dto);
         return ResponseEntity.noContent().build();
     }
-
+    
     @GetMapping("/pending/{userId}")
     public ResponseEntity<List<ConnectionResponseDTO>> getPending(
             @PathVariable Long userId) {
@@ -70,5 +72,23 @@ public class ConnectionController {
         connectionService.removeConnection(connectionId);
         return ResponseEntity.noContent().build();
     }
-}
 
+    @GetMapping("/count/{userId}")
+    public ResponseEntity<ConnectionCountDTO> getConnectionCount(
+            @PathVariable Long userId) {
+
+        return ResponseEntity.ok(
+                connectionService.getConnectionCount(userId)
+        );
+    }
+
+    @GetMapping("/status/{userId}/{targetUserId}")
+    public ResponseEntity<ConnectionStatusDTO> getConnectionStatus(
+            @PathVariable Long userId,
+            @PathVariable Long targetUserId) {
+
+        return ResponseEntity.ok(
+                connectionService.getConnectionStatus(userId, targetUserId)
+        );
+    }
+}

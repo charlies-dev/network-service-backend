@@ -37,8 +37,6 @@ public class PostInteractionServiceImpl implements PostInteractionService {
     private final UserClient userClient;
     private final ModelMapper modelMapper;
 
-    /* ================= ADD INTERACTION ================= */
-
     @Override
     @Transactional
     public Long addPostInteraction(
@@ -50,6 +48,12 @@ public class PostInteractionServiceImpl implements PostInteractionService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new InfyLinkedInException("Post not found"));
 
+        interactionRepository.findByPostIdAndUserIdAndType(postId, dto.getUserId(), dto.getType())
+                .ifPresent(existing -> {
+                    throw new InfyLinkedInException(
+                            "User already has a " + dto.getType().toString().toLowerCase() + " on this post");
+                });
+
         PostInteraction interaction = PostInteraction.builder()
                 .post(post)
                 .userId(dto.getUserId())
@@ -60,7 +64,6 @@ public class PostInteractionServiceImpl implements PostInteractionService {
 
         PostInteraction saved = interactionRepository.save(interaction);
 
-        /* ===== Notification to Post Owner ===== */
         Notification notification = Notification.builder()
                 .userId(post.getUserId())
                 .type(NotificationType.INTERACTION)
@@ -72,8 +75,6 @@ public class PostInteractionServiceImpl implements PostInteractionService {
 
         return saved.getId();
     }
-
-    /* ================= UPDATE INTERACTION ================= */
 
     @Override
     @Transactional
@@ -91,8 +92,6 @@ public class PostInteractionServiceImpl implements PostInteractionService {
         interaction.setCommentText(dto.getCommentText());
     }
 
-    /* ================= REMOVE INTERACTION ================= */
-
     @Override
     @Transactional
     public void removePostInteraction(Long interactionId) {
@@ -102,8 +101,6 @@ public class PostInteractionServiceImpl implements PostInteractionService {
 
         interactionRepository.delete(interaction);
     }
-
-    /* ================= GET BY POST ================= */
 
     @Override
     public List<PostInteractionResponseDTO> getPostInteractionByPostId(Long postId) {
@@ -128,8 +125,6 @@ public class PostInteractionServiceImpl implements PostInteractionService {
                 })
                 .toList();
     }
-
-    /* ================= MATRIX ================= */
 
     @Override
     public PostInteractionMatrixDTO getPostInteractionMatrixByPostId(Long postId) {
@@ -161,13 +156,11 @@ public class PostInteractionServiceImpl implements PostInteractionService {
                     "No users found for given interaction type");
         }
 
-        // Extract distinct userIds
         List<Long> userIds = interactions.stream()
                 .map(PostInteraction::getUserId)
                 .distinct()
                 .toList();
 
-        // Fetch users from User Service
         return userClient.getUsersByIds(userIds).stream().map(userEntity -> {
             UserDetailsDTO user = new UserDetailsDTO();
 

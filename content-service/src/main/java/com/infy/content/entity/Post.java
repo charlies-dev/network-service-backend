@@ -40,7 +40,6 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /** Author of post (User Service reference) */
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
@@ -59,8 +58,6 @@ public class Post {
 
     private LocalDateTime updatedAt;
 
-    /* ================= Relationships ================= */
-
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "post_hashtags",
@@ -75,4 +72,3 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostInteraction> interactions;
 }
-

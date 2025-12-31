@@ -99,8 +99,6 @@ public class JobApplicationServiceImpl implements JobApplicationService {
         application.setStatus(dto.getStatus());
     }
 
-    /* ================= GET BY USER ================= */
-
     @Override
     public List<JobApplicationResponseDTO> getApplicationByUserId(Long userId) {
 
@@ -120,8 +118,6 @@ public class JobApplicationServiceImpl implements JobApplicationService {
                 })
                 .toList();
     }
-
-    /* ================= GET BY JOB ================= */
 
     @Override
     public List<JobApplicationResponseDTO> getApplicationByJobId(Long jobId) {

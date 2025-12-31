@@ -74,7 +74,10 @@ public class UserClient {
             user.setFirstName(userEntity.getFirstName());
             user.setLastName(userEntity.getLastName());
             user.setEmailId(userEntity.getEmailId());
-            user.setProfilePhotoUrl(userEntity.getProfile().getProfilePhotoUrl());
+            if (userEntity.getProfile() != null) {
+                user.setHeadline(userEntity.getProfile().getHeadline());
+                user.setProfilePhotoUrl(userEntity.getProfile().getProfilePhotoUrl());
+            }
             return user;
 
         } catch (Exception ex) {

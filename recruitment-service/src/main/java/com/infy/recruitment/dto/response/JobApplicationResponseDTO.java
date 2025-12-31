@@ -13,12 +13,10 @@ public class JobApplicationResponseDTO {
     private ApplicationStatus status;
     private LocalDateTime appliedAt;
 
-    /* Job Details */
     private Long jobId;
     private String jobTitle;
     private String companyName;
 
-    /* User Details */
     UserDetailsDTO userDetails;
 
     private String resumeUrl;

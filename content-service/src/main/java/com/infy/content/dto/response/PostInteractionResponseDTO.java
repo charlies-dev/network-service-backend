@@ -16,4 +16,3 @@ public class PostInteractionResponseDTO {
     private String commentText;
     private LocalDateTime createdAt;
 }
-

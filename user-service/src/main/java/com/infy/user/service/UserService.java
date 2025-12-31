@@ -8,10 +8,8 @@ import com.infy.user.dto.request.UserLoginRequestDTO;
 import com.infy.user.dto.request.UserRegisterRequestDTO;
 import com.infy.user.dto.response.UserResponseDTO;
 
-
 public interface UserService {
 
-   
     Long registerUser(UserRegisterRequestDTO requestDTO);
 
     UserResponseDTO loginUser(UserLoginRequestDTO requestDTO);
@@ -25,10 +23,9 @@ public interface UserService {
     UserResponseDTO getUserById(Long userId);
     List<UserResponseDTO> getUserByIds(List<Long> userId);
 
-    List<UserResponseDTO> getAllUsers();
+    List<UserResponseDTO> getAllUsers(Integer limit);
 
     List<UserResponseDTO> searchUsersByName(String name);
-
 
     String addUserDetails(Long userId, UserDetailsRequestDTO requestDTO);
 }

@@ -7,9 +7,9 @@ import lombok.Data;
 @Data
 public class ConnectionGroupRequestDTO {
 
-    @NotNull
+    @NotNull(message = "{connection.group.userId.notnull}")
     private Long userId;
 
-    @NotBlank
+    @NotBlank(message = "{connection.group.groupName.notblank}")
     private String name;
 }

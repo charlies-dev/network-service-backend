@@ -21,7 +21,7 @@ public class ContentClient {
 
         webClientBuilder.build()
                 .post()
-                .uri("http://content-service/notifications")
+                 .uri("http://content-service/notifications")
                 .bodyValue(
                      new   NotificationCreateRequestDTO(userId,message,type)
                              

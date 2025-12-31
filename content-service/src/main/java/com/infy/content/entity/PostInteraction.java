@@ -38,7 +38,6 @@ public class PostInteraction {
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
-    /** Interacting user (User Service reference) */
     @Column(name = "user_id", nullable = false)
     private Long userId;
 

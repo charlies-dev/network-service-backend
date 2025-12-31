@@ -32,8 +32,6 @@ public class JobServiceImpl implements JobService {
     private final CompanyRepository companyRepository;
     private final ModelMapper modelMapper;
 
-    /* ================= ADD JOB ================= */
-
     @Override
     @Transactional
     public Long addNewJob(JobCreateRequestDTO dto) {
@@ -52,8 +50,6 @@ public class JobServiceImpl implements JobService {
 
         return jobRepository.save(job).getId();
     }
-
-    /* ================= UPDATE JOB ================= */
 
     @Override
     @Transactional
@@ -88,8 +84,6 @@ public class JobServiceImpl implements JobService {
             job.setApplicationDeadline(dto.getApplicationDeadline());
     }
 
-    /* ================= REMOVE JOB ================= */
-
     @Override
     @Transactional
     public void removeJob(Long jobId) {
@@ -101,7 +95,15 @@ public class JobServiceImpl implements JobService {
         jobRepository.delete(job);
     }
 
-    /* ================= GET BY COMPANY ================= */
+    @Override
+    public JobResponseDTO getJobByJobId(Long jobId) {
+
+        Job job = jobRepository.findById(jobId)
+                .orElseThrow(() ->
+                        new InfyLinkedInException("Job not found"));
+
+        return mapToResponse(job);
+    }
 
     @Override
     public List<JobResponseDTO> getJobByCompanyId(Long companyId) {
@@ -112,8 +114,6 @@ public class JobServiceImpl implements JobService {
                 .toList();
     }
 
-    /* ================= GET BY IDS ================= */
-
     @Override
     public List<JobResponseDTO> getJobByIds(List<Long> jobIds) {
 
@@ -122,8 +122,6 @@ public class JobServiceImpl implements JobService {
                 .map(this::mapToResponse)
                 .toList();
     }
-
-    /* ================= SEARCH + SORT ================= */
 
     @Override
     public Page<JobResponseDTO> searchJobAndSort(
@@ -159,7 +157,14 @@ public class JobServiceImpl implements JobService {
                 .map(this::mapToResponse);
     }
 
-    /* ================= MAPPER ================= */
+    @Override
+    public List<JobResponseDTO> getActiveJobs() {
+
+        return jobRepository.findByApplicationDeadlineGreaterThanEqual(LocalDate.now())
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
 
     private JobResponseDTO mapToResponse(Job job) {
         JobResponseDTO dto = modelMapper.map(job, JobResponseDTO.class);

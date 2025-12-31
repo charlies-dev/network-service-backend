@@ -11,7 +11,9 @@ import com.infy.network.client.ContentClient;
 import com.infy.network.client.UserClient;
 import com.infy.network.dto.request.ConnectionRequestDTO;
 import com.infy.network.dto.request.ConnectionStatusUpdateDTO;
+import com.infy.network.dto.response.ConnectionCountDTO;
 import com.infy.network.dto.response.ConnectionResponseDTO;
+import com.infy.network.dto.response.ConnectionStatusDTO;
 import com.infy.network.dto.response.UserDetailsDTO;
 import com.infy.network.entity.Connection;
 import com.infy.network.enums.ConnectionStatus;
@@ -30,21 +32,10 @@ public class ConnectionServiceImpl implements ConnectionService {
     private final UserClient userClient;
     private final ContentClient contentClient;
     private final ModelMapper modelMapper;
-
-    /* ================= SEND REQUEST ================= */
-
-    @Override
+       @Override
     @Transactional
     public Long sendConnectionRequest(ConnectionRequestDTO dto) {
-        long userA = Math.min(dto.getUserId(), dto.getConnectedUserId());
-        long userB = Math.max(dto.getUserId(), dto.getConnectedUserId());
-
-        Optional<Connection> existing = connectionRepository.findByUserIdAndConnectedUserId(userA, userB);
-
-        if (existing.isPresent()) {
-
-            throw new InfyLinkedInException("Connection already exists");
-        }
+        
         userClient.validateUserExists(dto.getUserId());
         userClient.validateUserExists(dto.getConnectedUserId());
 
@@ -52,6 +43,14 @@ public class ConnectionServiceImpl implements ConnectionService {
                 .findByUserIdAndConnectedUserId(
                         dto.getUserId(),
                         dto.getConnectedUserId())
+                .ifPresent(c -> {
+                    throw new InfyLinkedInException(
+                            "Connection request already exists");
+                });
+        connectionRepository
+                .findByUserIdAndConnectedUserId(
+                        dto.getConnectedUserId(),
+                        dto.getUserId())
                 .ifPresent(c -> {
                     throw new InfyLinkedInException(
                             "Connection request already exists");
@@ -74,8 +73,6 @@ public class ConnectionServiceImpl implements ConnectionService {
         return saved.getId();
     }
 
-    /* ================= UPDATE STATUS ================= */
-
     @Override
     @Transactional
     public void updateConnectionRequestStatus(
@@ -94,8 +91,6 @@ public class ConnectionServiceImpl implements ConnectionService {
                         dto.getStatus().name().toLowerCase(),
                 NotificationType.CONNECTION);
     }
-
-    /* ================= PENDING REQUESTS ================= */
 
     @Override
     public List<ConnectionResponseDTO> getPendingConnectionByUserId(
@@ -119,27 +114,29 @@ public class ConnectionServiceImpl implements ConnectionService {
                 .toList();
     }
 
-    /* ================= ACCEPTED CONNECTIONS ================= */
-
     @Override
     public List<ConnectionResponseDTO> getConnectionByUserId(Long userId) {
 
         return connectionRepository
                 .findAcceptedConnections(userId)
                 .stream()
+                
                 .map(c -> {
                     ConnectionResponseDTO connectionResponseDTO = modelMapper.map(c, ConnectionResponseDTO.class);
-                    UserDetailsDTO user = userClient.getUserDetailsById(c.getUserId());
-                    UserDetailsDTO connectedUser = userClient.getUserDetailsById(c.getConnectedUserId());
-
-                    connectionResponseDTO.setConnectedUser(connectedUser);
+                    
+                    Long otherUserId = c.getUserId().equals(userId) 
+                            ? c.getConnectedUserId() 
+                            : c.getUserId();
+                    
+                    UserDetailsDTO user = userClient.getUserDetailsById(otherUserId);
+                    UserDetailsDTO connectedUser = userClient.getUserDetailsById(userId);
+                    
                     connectionResponseDTO.setUser(user);
+                    connectionResponseDTO.setConnectedUser(connectedUser);
                     return connectionResponseDTO;
                 })
                 .toList();
     }
-
-    /* ================= REMOVE ================= */
 
     @Override
     @Transactional
@@ -149,5 +146,57 @@ public class ConnectionServiceImpl implements ConnectionService {
                 .orElseThrow(() -> new InfyLinkedInException("Connection not found"));
 
         connectionRepository.delete(connection);
+    }
+
+    @Override
+    public ConnectionCountDTO getConnectionCount(Long userId) {
+        userClient.validateUserExists(userId);
+        
+        Long acceptedConnectionCount = connectionRepository.countAcceptedConnections(userId);
+        Long pendingRequestCount = connectionRepository.countPendingConnections(userId);
+
+        return new ConnectionCountDTO(
+                userId,
+                acceptedConnectionCount != null ? acceptedConnectionCount : 0L,
+                pendingRequestCount != null ? pendingRequestCount : 0L
+        );
+    }
+
+    @Override
+    public ConnectionStatusDTO getConnectionStatus(Long userId, Long targetUserId) {
+        
+        userClient.validateUserExists(userId);
+        userClient.validateUserExists(targetUserId);
+
+        boolean connected = false;
+        boolean requestPending = false;
+        String connectionMessage = "No connection";
+
+        Optional<Connection> acceptedConnection = connectionRepository.findAcceptedConnectionBetween(userId, targetUserId);
+        if (acceptedConnection.isPresent()) {
+            connected = true;
+            connectionMessage = "Connected";
+        } else {
+            
+            Optional<Connection> pendingFromUser = connectionRepository.findPendingRequestFrom(userId, targetUserId);
+            if (pendingFromUser.isPresent()) {
+                requestPending = true;
+                connectionMessage = "Request pending";
+            } else {
+             Optional<Connection> pendingToUser = connectionRepository.findPendingRequestTo(userId, targetUserId);
+                if (pendingToUser.isPresent()) {
+                    requestPending = true;
+                    connectionMessage = "Request pending from user";
+                }
+            }
+        }
+
+        return ConnectionStatusDTO.builder()
+                .userId(userId)
+                .targetUserId(targetUserId)
+                .connected(connected)
+                .requestPending(requestPending)
+                .connectionMessage(connectionMessage)
+                .build();
     }
 }

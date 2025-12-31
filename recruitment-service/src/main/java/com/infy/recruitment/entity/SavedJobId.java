@@ -1,7 +1,5 @@
 package com.infy.recruitment.entity;
 
-
-
 import java.io.Serializable;
 
 import lombok.AllArgsConstructor;

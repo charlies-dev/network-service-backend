@@ -1,19 +1,17 @@
 package com.infy.user.service;
 
-import com.infy.user.dto.request.UserSkillRequestDTO;
+import java.util.List;
+
 import com.infy.user.dto.response.UserResponseDTO;
 import com.infy.user.dto.response.UserSkillResponseDTO;
-import java.util.List;
 
 public interface UserSkillService {
 
-    Long addUserSkill(Long userId, UserSkillRequestDTO requestDTO);
+    Long addUserSkill(Long userId, String requestDTO);
 
-    List<Long> addUserSkills(Long userId, List<UserSkillRequestDTO> requestDTOs);
+    List<Long> addUserSkills(Long userId, List<String> requestDTOs);
 
-    void updateUserSkill(Long userSkillId, UserSkillRequestDTO requestDTO);
-
-    void removeUserSkill(Long userSkillId);
+    void updateUserSkill(Long userSkillId, String requestDTO);
 
     List<UserSkillResponseDTO> getUserSkillDetailByUserId(Long userId);
 

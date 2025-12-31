@@ -40,8 +40,6 @@ public class JobApplicationController {
         );
     }
 
-    
-
     @PatchMapping("/{applicationId}/status")
     public ResponseEntity<Void> updateStatus(
             @PathVariable Long applicationId,
@@ -84,8 +82,6 @@ public class JobApplicationController {
                 applicationId, resume, coverLetter);
         return ResponseEntity.noContent().build();
     }
-
-    
 
     @PatchMapping("/{applicationId}/withdraw")
     public ResponseEntity<Void> withdraw(

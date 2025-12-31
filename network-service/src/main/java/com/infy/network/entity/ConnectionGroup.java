@@ -30,7 +30,6 @@ public class ConnectionGroup {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /** Group owner (creator) */
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
@@ -38,8 +37,6 @@ public class ConnectionGroup {
     private String name;
 
     private LocalDateTime addedAt;
-
-    /* ================= Relationships ================= */
 
     @OneToMany(
         mappedBy = "group",

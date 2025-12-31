@@ -5,6 +5,8 @@ import lombok.Data;
 
 @Data
 public class UserSkillDTO {
+
+    Long id;
      @NotNull
     private String skillName;
 }

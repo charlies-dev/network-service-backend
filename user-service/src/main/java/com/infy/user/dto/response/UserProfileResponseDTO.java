@@ -1,10 +1,11 @@
-package com.infy.user.dto.request;
+package com.infy.user.dto.response;
 
 import lombok.Data;
 
 @Data
-public class UserProfileUpdateDTO {
+public class UserProfileResponseDTO {
 
+    private Long id;
     private String headline;
     private String summary;
     private String currentJobTitle;

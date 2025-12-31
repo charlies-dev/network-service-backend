@@ -10,6 +10,8 @@ import lombok.Data;
 
 @Data
 public class UserExperienceDTO {
+
+  private  Long id;
     @NotBlank
     private String companyName;
 

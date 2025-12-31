@@ -9,4 +9,3 @@ public class UserSkillResponseDTO {
     private Long skillId;
     private String skillName;
 }
-

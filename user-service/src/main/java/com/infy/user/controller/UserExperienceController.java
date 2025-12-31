@@ -12,9 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.infy.user.dto.request.UserExperienceListRequestDTO;
 import com.infy.user.dto.request.UserExperienceRequestDTO;
-import com.infy.user.dto.request.UserExperienceUpdateDTO;
 import com.infy.user.dto.response.UserExperienceResponseDTO;
 import com.infy.user.service.UserExperienceService;
 
@@ -39,18 +37,18 @@ public class UserExperienceController {
     @PostMapping("/user/{userId}/bulk")
     public ResponseEntity<List<Long>> addExperiences(
             @PathVariable Long userId,
-            @Valid @RequestBody UserExperienceListRequestDTO dto) {
+            @Valid @RequestBody List<UserExperienceRequestDTO> dto) {
 
         return ResponseEntity.ok(
                 experienceService.addUserExperiences(
                         userId,
-                        dto.getExperiences()));
+                        dto));
     }
 
     @PutMapping("/{experienceId}")
     public ResponseEntity<Void> updateExperience(
             @PathVariable Long experienceId,
-            @RequestBody UserExperienceUpdateDTO dto) {
+            @RequestBody UserExperienceRequestDTO dto) {
 
         experienceService.updateUserExperienceDetails(experienceId, dto);
         return ResponseEntity.noContent().build();

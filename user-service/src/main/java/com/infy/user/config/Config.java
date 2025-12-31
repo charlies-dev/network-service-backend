@@ -19,5 +19,5 @@ public class Config {
 
     return modelMapper;
     }
-    
+
 }

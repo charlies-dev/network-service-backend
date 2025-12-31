@@ -2,7 +2,6 @@ package com.infy.recruitment.entity;
 
 import java.util.List;
 
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,11 +36,6 @@ public class Company {
 
     private String industry;
 
-    /* ================= Relationships ================= */
-
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Job> jobs;
 }
-
-
-

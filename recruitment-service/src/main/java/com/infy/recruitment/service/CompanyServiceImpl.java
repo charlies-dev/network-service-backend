@@ -21,8 +21,6 @@ public class CompanyServiceImpl implements CompanyService {
     private final CompanyRepository companyRepository;
     private final ModelMapper modelMapper;
 
-    /* ================= ADD COMPANY ================= */
-
     @Override
     @Transactional
     public Long addNewCompany(CompanyCreateRequestDTO dto) {
@@ -35,8 +33,6 @@ public class CompanyServiceImpl implements CompanyService {
 
         return companyRepository.save(company).getId();
     }
-
-    /* ================= UPDATE COMPANY ================= */
 
     @Override
     @Transactional
@@ -58,8 +54,6 @@ public class CompanyServiceImpl implements CompanyService {
             company.setIndustry(dto.getIndustry());
     }
 
-    /* ================= REMOVE COMPANY ================= */
-
     @Override
     @Transactional
     public void removeCompany(Long companyId) {
@@ -71,8 +65,6 @@ public class CompanyServiceImpl implements CompanyService {
         companyRepository.delete(company);
     }
 
-    /* ================= GET BY ID ================= */
-
     @Override
     public CompanyResponseDTO getCompanyByCompanyId(Long companyId) {
 
@@ -82,8 +74,6 @@ public class CompanyServiceImpl implements CompanyService {
 
         return modelMapper.map(company, CompanyResponseDTO.class);
     }
-
-    /* ================= GET ALL ================= */
 
     @Override
     public List<CompanyResponseDTO> getAllCompanies() {

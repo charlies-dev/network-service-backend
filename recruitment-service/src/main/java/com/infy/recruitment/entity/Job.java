@@ -1,6 +1,5 @@
 package com.infy.recruitment.entity;
 
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -39,8 +38,6 @@ public class Job {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /* ================= Relationships ================= */
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id", nullable = false)
     private Company company;
@@ -66,8 +63,6 @@ public class Job {
     private LocalDate applicationDeadline;
 
     private LocalDateTime createdAt;
-
-    /* ================= Relationships ================= */
 
     @OneToMany(mappedBy = "job", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<JobApplication> applications;

@@ -1,5 +1,6 @@
 server:
   port: 8080
+ 
 
 spring:
   application:
@@ -15,6 +16,7 @@ spring:
         
     
     gateway:
+      
       discovery:
         locator:
           enabled: false
@@ -25,7 +27,12 @@ spring:
           uri: lb://user-service
           predicates:
             - Path=/auth/**,/uploads/user-profile/**
-
+        
+        - id: recruitment-service
+          uri: lb://recruitment-service
+          predicates:
+            - Path=/uploads/**
+            
         # USER SERVICE
         - id: user-service
           uri: lb://user-service
@@ -68,8 +75,8 @@ spring:
           predicates:
             - Path=
                 /jobs/**,
-                /job-applications/**,
+                /job-applications/**, /saved-jobs/**,
                 /companies/**
-                /uploads/**
+                
           filters:
             - JwtAuthenticationFilter

@@ -10,9 +10,8 @@ import lombok.Data;
 @Data
 public class PostStatusUpdateDTO {
 
-    @NotNull
+    @NotNull(message = "{post.status.update.status.notnull}")
     private PostStatus status;
 
     private LocalDateTime scheduledAt;
 }
-

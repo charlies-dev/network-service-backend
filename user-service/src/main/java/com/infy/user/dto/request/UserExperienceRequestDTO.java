@@ -32,4 +32,3 @@ public class UserExperienceRequestDTO {
 
     private String description;
 }
-

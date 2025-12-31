@@ -6,10 +6,9 @@ import lombok.Data;
 @Data
 public class ConnectionRequestDTO {
 
-    @NotNull
-    private Long userId;              // sender
+    @NotNull(message = "{connection.userId.notnull}")
+    private Long userId;              
 
-    @NotNull
-    private Long connectedUserId;     // receiver
+    @NotNull(message = "{connection.connectedUserId.notnull}")
+    private Long connectedUserId;     
 }
-

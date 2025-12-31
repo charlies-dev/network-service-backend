@@ -26,6 +26,7 @@ import com.infy.user.entity.UserSkill;
 import com.infy.user.exception.InfyLinkedInException;
 import com.infy.user.repository.SkillRepository;
 import com.infy.user.repository.UserRepository;
+import com.infy.user.util.UserProfileImageUploadUtil;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -39,11 +40,15 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     private final SkillRepository skillRepository;
+    private final UserProfileImageUploadUtil imageUploadUtil;
 
     @Override
     public Long registerUser(UserRegisterRequestDTO requestDTO) {
         if (userRepository.existsByEmailId(requestDTO.getEmailId())) {
             throw new InfyLinkedInException("Email already registered");
+        }
+        if (userRepository.existsByMobileNo(requestDTO.getMobileNo())) {
+            throw new InfyLinkedInException("Mobile no already registered");
         }
 
         User user = modelMapper.map(requestDTO, User.class);
@@ -104,56 +109,12 @@ public class UserServiceImpl implements UserService {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new InfyLinkedInException("User not found"));
-        // System.out.println(user);
-        UserResponseDTO responseDTO = modelMapper.map(user, UserResponseDTO.class);
-
-        if (user.getEducations() != null) {
-            List<EducationDTO> educationDTO = user.getEducations().stream()
-                    .map(entity -> {
-                        EducationDTO dto = modelMapper.map(entity, EducationDTO.class);
-
-                        return dto;
-                    })
-                    .toList();
-            responseDTO.setEducations(educationDTO);
-
-        }
-        if (user.getExperiences() != null) {
-            List<UserExperienceDTO> experienceDTO = user.getExperiences().stream()
-                    .map(entity -> {
-                        UserExperienceDTO dto = modelMapper.map(entity, UserExperienceDTO.class);
-
-                        return dto;
-                    })
-                    .toList();
-            responseDTO.setExperiences(experienceDTO);
-
-        }
-        if (user.getUserSkills() != null) {
-            List<UserSkillDTO> skillDTO = user.getUserSkills().stream()
-                    .map(entity -> {
-                        UserSkillDTO dto = new UserSkillDTO();
-
-                        dto.setSkillName(entity.getSkill().getName());
-                        return dto;
-                    })
-                    .toList();
-            responseDTO.setUserSkills(skillDTO);
-
-        }
-        if (user.getProfile() != null) {
-            UserProfileDTO profileDTO = modelMapper.map(user.getProfile(), UserProfileDTO.class);
-            responseDTO.setProfile(profileDTO);
-
-        }
-
-        return responseDTO;
+        
+        return getUserResponseDTO(user);
     }
 
-    /* ================= GET ALL USERS ================= */
-
     @Override
-    public List<UserResponseDTO> getAllUsers() {
+    public List<UserResponseDTO> getAllUsers(Integer limit) {
 
         List<User> users = userRepository.findAll();
 
@@ -161,55 +122,18 @@ public class UserServiceImpl implements UserService {
             throw new InfyLinkedInException("No users found");
         }
 
-        return users.stream()
-                .map(user -> {
-                    UserResponseDTO responseDTO = modelMapper.map(user, UserResponseDTO.class);
-
-                    if (user.getEducations() != null) {
-                        List<EducationDTO> educationDTO = user.getEducations().stream()
-                                .map(entity -> {
-                                    EducationDTO dto = modelMapper.map(entity, EducationDTO.class);
-
-                                    return dto;
-                                })
-                                .toList();
-                        responseDTO.setEducations(educationDTO);
-
-                    }
-                    if (user.getExperiences() != null) {
-                        List<UserExperienceDTO> experienceDTO = user.getExperiences().stream()
-                                .map(entity -> {
-                                    UserExperienceDTO dto = modelMapper.map(entity, UserExperienceDTO.class);
-
-                                    return dto;
-                                })
-                                .toList();
-                        responseDTO.setExperiences(experienceDTO);
-
-                    }
-                    if (user.getUserSkills() != null) {
-                        List<UserSkillDTO> skillDTO = user.getUserSkills().stream()
-                                .map(entity -> {
-                                    UserSkillDTO dto = new UserSkillDTO();
-
-                                    dto.setSkillName(entity.getSkill().getName());
-                                    return dto;
-                                })
-                                .toList();
-                        responseDTO.setUserSkills(skillDTO);
-
-                    }
-                    if (user.getProfile() != null) {
-                        UserProfileDTO profileDTO = modelMapper.map(user.getProfile(), UserProfileDTO.class);
-                        responseDTO.setProfile(profileDTO);
-
-                    }
-                    return responseDTO;
-                })
+        List<UserResponseDTO> userDTOs = users.stream()
+                .map(this::getUserResponseDTO)
                 .toList();
-    }
 
-    /* ================= SEARCH USERS BY NAME ================= */
+        if (limit != null && limit > 0) {
+            return userDTOs.stream()
+                    .limit(limit)
+                    .toList();
+        }
+
+        return userDTOs;
+    }
 
     @Override
     public List<UserResponseDTO> searchUsersByName(String name) {
@@ -225,7 +149,7 @@ public class UserServiceImpl implements UserService {
         }
 
         return users.stream()
-                .map(user -> modelMapper.map(user, UserResponseDTO.class))
+                .map(this::getUserResponseDTO)
                 .toList();
     }
 
@@ -234,20 +158,18 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new InfyLinkedInException("User not found"));
 
-        /* ================= PROFILE ================= */
         if (requestDTO.getProfile() != null) {
 
             UserProfile profile = modelMapper.map(
                     requestDTO.getProfile(),
                     UserProfile.class);
-
+           
             profile.setUser(user);
             profile.setCreatedAt(LocalDateTime.now());
 
             user.setProfile(profile);
         }
 
-        /* ================= EDUCATION ================= */
         if (requestDTO.getEducations() != null &&
                 !requestDTO.getEducations().isEmpty()) {
 
@@ -265,7 +187,6 @@ public class UserServiceImpl implements UserService {
             user.getEducations().addAll(educations);
         }
 
-        /* ================= EXPERIENCE ================= */
         if (requestDTO.getExperiences() != null &&
                 !requestDTO.getExperiences().isEmpty()) {
 
@@ -283,17 +204,16 @@ public class UserServiceImpl implements UserService {
             user.getExperiences().addAll(experiences);
         }
 
-        /* ================= SKILLS ================= */
         if (requestDTO.getUserSkills() != null &&
                 !requestDTO.getUserSkills().isEmpty()) {
 
             List<UserSkill> skills = requestDTO.getUserSkills()
                     .stream()
                     .map(dto -> {
-                        Skill skill = skillRepository.findByName(dto.getSkillName())
+                        Skill skill = skillRepository.findByName(dto)
                                 .orElseGet(() -> {
                                     Skill newSkill = new Skill();
-                                    newSkill.setName(dto.getSkillName());
+                                    newSkill.setName(dto);
                                     return skillRepository.save(newSkill);
                                 });
 
@@ -325,46 +245,53 @@ public class UserServiceImpl implements UserService {
         }
 
         return users.stream()
-                .map(user -> {
-                    UserResponseDTO responseDTO = modelMapper.map(user, UserResponseDTO.class);
-
-                    // Educations
-                    if (user.getEducations() != null) {
-                        responseDTO.setEducations(
-                                user.getEducations().stream()
-                                        .map(e -> modelMapper.map(e, EducationDTO.class))
-                                        .toList());
-                    }
-
-                    // Experiences
-                    if (user.getExperiences() != null) {
-                        responseDTO.setExperiences(
-                                user.getExperiences().stream()
-                                        .map(e -> modelMapper.map(e, UserExperienceDTO.class))
-                                        .toList());
-                    }
-
-                    // Skills
-                    if (user.getUserSkills() != null) {
-                        responseDTO.setUserSkills(
-                                user.getUserSkills().stream()
-                                        .map(skill -> {
-                                            UserSkillDTO dto = new UserSkillDTO();
-                                            dto.setSkillName(skill.getSkill().getName());
-                                            return dto;
-                                        })
-                                        .toList());
-                    }
-
-                    // Profile
-                    if (user.getProfile() != null) {
-                        responseDTO.setProfile(
-                                modelMapper.map(user.getProfile(), UserProfileDTO.class));
-                    }
-
-                    return responseDTO;
-                })
+                .map(this::getUserResponseDTO)
                 .toList();
     }
 
+    private UserResponseDTO getUserResponseDTO(User user){
+        UserResponseDTO responseDTO = modelMapper.map(user, UserResponseDTO.class);
+
+        if (user.getEducations() != null) {
+            List<EducationDTO> educationDTO = user.getEducations().stream()
+                    .map(entity -> {
+                        EducationDTO dto = modelMapper.map(entity, EducationDTO.class);
+
+                        return dto;
+                    })
+                    .toList();
+            responseDTO.setEducations(educationDTO);
+
+        }
+        if (user.getExperiences() != null) {
+            List<UserExperienceDTO> experienceDTO = user.getExperiences().stream()
+                    .map(entity -> {
+                        UserExperienceDTO dto = modelMapper.map(entity, UserExperienceDTO.class);
+
+                        return dto;
+                    })
+                    .toList();
+            responseDTO.setExperiences(experienceDTO);
+
+        }
+        if (user.getUserSkills() != null) {
+            List<UserSkillDTO> skillDTO = user.getUserSkills().stream()
+                    .map(entity -> {
+                        UserSkillDTO dto = new UserSkillDTO();
+                        dto.setId(entity.getSkill().getId());
+                        dto.setSkillName(entity.getSkill().getName());
+                        return dto;
+                    })
+                    .toList();
+            responseDTO.setUserSkills(skillDTO);
+
+        }
+        if (user.getProfile() != null) {
+            UserProfileDTO profileDTO = modelMapper.map(user.getProfile(), UserProfileDTO.class);
+            responseDTO.setProfile(profileDTO);
+
+        }
+
+        return responseDTO;
+    }
 }

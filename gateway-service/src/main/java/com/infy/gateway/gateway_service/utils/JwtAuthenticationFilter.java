@@ -1,6 +1,7 @@
 package com.infy.gateway.gateway_service.utils;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,7 @@ import org.springframework.web.server.ServerWebExchange;
 
 import io.jsonwebtoken.Claims;
 import reactor.core.publisher.Mono;
+
 @Component
 public class JwtAuthenticationFilter
         extends AbstractGatewayFilterFactory<JwtAuthenticationFilter.Config> {
@@ -36,13 +38,18 @@ public class JwtAuthenticationFilter
             try {
                 Claims claims = jwtUtil.validateToken(token);
 
+                List<?> roles = claims.get("role", List.class);
+                String rolesString = roles != null ? String.join(",", 
+                    roles.stream().map(Object::toString).toArray(String[]::new)) : "";
+
                 exchange.getRequest()
                         .mutate()
                         .header("X-User-Id", claims.getSubject())
-                        .header("X-User-Role", claims.get("role", String.class))
+                        .header("X-User-Role", rolesString)
                         .build();
 
             } catch (Exception e) {
+                System.out.println(e.getMessage());
                 return unauthorized(exchange);
             }
 

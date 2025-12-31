@@ -1,6 +1,5 @@
 package com.infy.content.entity;
 
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -33,7 +32,6 @@ public class PostMention {
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
-    /** Mentioned user ID (User Service) */
     @Column(name = "mentioned_user_id", nullable = false)
     private Long mentionedUserId;
 }

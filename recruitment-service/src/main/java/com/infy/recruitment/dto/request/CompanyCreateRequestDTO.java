@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class CompanyCreateRequestDTO {
 
-    @NotBlank
+    @NotBlank(message = "{company.name.notblank}")
     private String name;
 
     private String location;

@@ -18,4 +18,3 @@ public class SavedJobResponseDTO {
     private LocalDate applicationDeadline;
     private LocalDateTime savedAt;
 }
-

@@ -36,8 +36,6 @@ public class ConnectionGroupMember {
 
     private LocalDateTime addedAt;
 
-    /* ================= Relationships ================= */
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id", insertable = false, updatable = false)
     private ConnectionGroup group;

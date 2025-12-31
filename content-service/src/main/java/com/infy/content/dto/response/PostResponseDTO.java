@@ -13,11 +13,14 @@ import lombok.Data;
 public class PostResponseDTO {
 
     private Long id;
-    private UserResponseDTO user;
+    private UserDetailsDTO user;
     private String content;
     private PostType type;
     private PostStatus status;
     private LocalDateTime scheduledAt;
     private Set<String> hashtags;
-    private List<UserResponseDTO> mentionedUser;
+    private List<UserDetailsDTO> mentionedUser;
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
 }

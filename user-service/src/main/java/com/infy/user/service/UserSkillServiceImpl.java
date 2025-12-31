@@ -6,7 +6,6 @@ import java.util.Objects;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import com.infy.user.dto.request.UserSkillRequestDTO;
 import com.infy.user.dto.response.UserResponseDTO;
 import com.infy.user.dto.response.UserSkillResponseDTO;
 import com.infy.user.entity.Skill;
@@ -28,20 +27,19 @@ public class UserSkillServiceImpl implements UserSkillService {
         private final SkillRepository skillRepository;
         private final UserSkillRepository userSkillRepository;
         private final ModelMapper modelMapper;
-        /* ================= ADD SINGLE SKILL ================= */
-
+        
         @Override
         @Transactional
-        public Long addUserSkill(Long userId, UserSkillRequestDTO requestDTO) {
+        public Long addUserSkill(Long userId, String requestDTO) {
 
                 User user = userRepository.findById(userId)
                                 .orElseThrow(() -> new InfyLinkedInException("User not found"));
 
                 Skill skill = skillRepository
-                                .findByNameIgnoreCase(requestDTO.getSkillName())
+                                .findByNameIgnoreCase(requestDTO)
                                 .orElseGet(() -> skillRepository.save(
                                                 Skill.builder()
-                                                                .name(requestDTO.getSkillName())
+                                                                .name(requestDTO)
                                                                 .build()));
 
                 if (userSkillRepository.existsByUserIdAndSkillId(userId, skill.getId())) {
@@ -56,13 +54,11 @@ public class UserSkillServiceImpl implements UserSkillService {
                 return userSkillRepository.save(userSkill).getId();
         }
 
-        /* ================= ADD MULTIPLE SKILLS ================= */
-
         @Override
         @Transactional
         public List<Long> addUserSkills(
                         Long userId,
-                        List<UserSkillRequestDTO> requestDTOs) {
+                        List<String> requestDTOs) {
 
                 if (requestDTOs == null || requestDTOs.isEmpty()) {
                         throw new InfyLinkedInException("Skill list cannot be empty");
@@ -75,10 +71,10 @@ public class UserSkillServiceImpl implements UserSkillService {
                                 .map(dto -> {
 
                                         Skill skill = skillRepository
-                                                        .findByNameIgnoreCase(dto.getSkillName())
+                                                        .findByNameIgnoreCase(dto)
                                                         .orElseGet(() -> skillRepository.save(
                                                                         Skill.builder()
-                                                                                        .name(dto.getSkillName())
+                                                                                        .name(dto)
                                                                                         .build()));
 
                                         if (userSkillRepository.existsByUserIdAndSkillId(userId, skill.getId())) {
@@ -99,38 +95,22 @@ public class UserSkillServiceImpl implements UserSkillService {
                                 .toList();
         }
 
-        /* ================= UPDATE USER SKILL ================= */
-
         @Override
         @Transactional
-        public void updateUserSkill(Long userSkillId, UserSkillRequestDTO requestDTO) {
+        public void updateUserSkill(Long userSkillId, String requestDTO) {
 
                 UserSkill userSkill = userSkillRepository.findById(userSkillId)
                                 .orElseThrow(() -> new InfyLinkedInException("User skill not found"));
 
                 Skill skill = skillRepository
-                                .findByNameIgnoreCase(requestDTO.getSkillName())
+                                .findByNameIgnoreCase(requestDTO)
                                 .orElseGet(() -> skillRepository.save(
                                                 Skill.builder()
-                                                                .name(requestDTO.getSkillName())
+                                                                .name(requestDTO)
                                                                 .build()));
 
                 userSkill.setSkill(skill);
         }
-
-        /* ================= REMOVE SKILL ================= */
-
-        @Override
-        @Transactional
-        public void removeUserSkill(Long userSkillId) {
-
-                UserSkill userSkill = userSkillRepository.findById(userSkillId)
-                                .orElseThrow(() -> new InfyLinkedInException("User skill not found"));
-
-                userSkillRepository.delete(userSkill);
-        }
-
-        /* ================= GET BY USER ================= */
 
         @Override
         public List<UserSkillResponseDTO> getUserSkillDetailByUserId(Long userId) {

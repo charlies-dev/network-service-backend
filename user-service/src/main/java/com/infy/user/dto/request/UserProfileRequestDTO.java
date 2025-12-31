@@ -1,7 +1,5 @@
 package com.infy.user.dto.request;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -21,8 +19,5 @@ public class UserProfileRequestDTO {
     private String location;
     private String country;
 
-    /* Image file */
-    private MultipartFile profilePhoto;
-    
     private Boolean profileCompleted;
 }

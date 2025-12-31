@@ -62,8 +62,6 @@ public class User {
 
     private LocalDate updatedAt;
 
-    /* ================= Relationships ================= */
-
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private UserProfile profile;
 

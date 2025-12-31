@@ -10,11 +10,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.infy.recruitment.dto.response.ApiResponse;
 
-
-
-
-
-
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 

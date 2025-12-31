@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 public class EducationDTO {
-    
+    private  Long id;
     @NotBlank
     private String institution;
 

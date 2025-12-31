@@ -8,10 +8,10 @@ import lombok.Data;
 @Data
 public class PostInteractionRequestDTO {
 
-    @NotNull
+    @NotNull(message = "{post.interaction.userId.notnull}")
     private Long userId;
 
-    @NotNull
+    @NotNull(message = "{post.interaction.interactionType.notnull}")
     private InteractionType type;
 
     private String commentText;

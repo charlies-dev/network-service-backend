@@ -22,7 +22,6 @@ public class Config {
     return modelMapper;
   }
 
-
   @Bean
   @LoadBalanced
   WebClient.Builder webClientBuilder() {

@@ -1,6 +1,5 @@
 package com.infy.recruitment.entity;
 
-
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
@@ -36,8 +35,6 @@ public class SavedJob {
     private Long jobId;
 
     private LocalDateTime savedAt;
-
-    /* ================= Relationships ================= */
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "job_id", insertable = false, updatable = false)

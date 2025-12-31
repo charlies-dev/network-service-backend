@@ -37,11 +37,9 @@ public class Connection {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /** Sender */
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    /** Receiver */
     @Column(name = "connected_user_id", nullable = false)
     private Long connectedUserId;
 

@@ -14,16 +14,16 @@ import lombok.Data;
 @Data
 public class PostCreateRequestDTO {
 
-    @NotNull
+    @NotNull(message = "{post.userId.notnull}")
     private Long userId;
 
-    @NotBlank
+    @NotBlank(message = "{post.content.notblank}")
     private String content;
 
-    @NotNull
+    @NotNull(message = "{post.type.notnull}")
     private PostType type;
 
-    @NotNull
+    @NotNull(message = "{post.status.notnull}")
     private PostStatus status;
 
     private LocalDateTime scheduledAt;

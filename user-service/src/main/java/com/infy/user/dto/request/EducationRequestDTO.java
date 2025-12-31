@@ -19,4 +19,3 @@ public class EducationRequestDTO {
 
     private Integer endYear;
 }
-

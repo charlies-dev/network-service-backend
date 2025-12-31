@@ -10,12 +10,16 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.infy.content.client.NetworkClient;
 import com.infy.content.client.UserClient;
 import com.infy.content.dto.request.PostCreateRequestDTO;
 import com.infy.content.dto.request.PostStatusUpdateDTO;
 import com.infy.content.dto.request.PostUpdateRequestDTO;
+import com.infy.content.dto.response.PostCountDTO;
 import com.infy.content.dto.response.PostResponseDTO;
+import com.infy.content.dto.response.UserDetailsDTO;
 import com.infy.content.dto.response.UserResponseDTO;
+import com.infy.content.dto.response.UserStatsDTO;
 import com.infy.content.entity.Hashtag;
 import com.infy.content.entity.Notification;
 import com.infy.content.entity.Post;
@@ -38,9 +42,8 @@ public class PostServiceImpl implements PostService {
         private final HashtagRepository hashtagRepository;
         private final NotificationRepository notificationRepository;
         private final UserClient userClient;
+        private final NetworkClient networkClient;
         private final ModelMapper modelMapper;
-
-        /* ================= CREATE POST ================= */
 
         @Override
         @Transactional
@@ -63,7 +66,6 @@ public class PostServiceImpl implements PostService {
                                 .createdAt(LocalDateTime.now())
                                 .build();
 
-                /* ================= HASHTAGS ================= */
                 if (dto.getHashtags() != null) {
                         Set<Hashtag> hashtags = dto.getHashtags().stream()
                                         .map(name -> hashtagRepository.findByNameIgnoreCase(name)
@@ -73,7 +75,6 @@ public class PostServiceImpl implements PostService {
                         post.setHashtags(hashtags);
                 }
 
-                /* ================= MENTIONS ================= */
                 if (dto.getMentionedUserIds() != null) {
                         userClient.getUsersByIds(dto.getMentionedUserIds());
 
@@ -102,8 +103,6 @@ public class PostServiceImpl implements PostService {
                 return postRepository.save(post).getId();
         }
 
-        /* ================= UPDATE POST ================= */
-
         @Override
         @Transactional
         public void updatePost(Long postId, PostUpdateRequestDTO dto) {
@@ -111,11 +110,9 @@ public class PostServiceImpl implements PostService {
                 Post post = postRepository.findById(postId)
                                 .orElseThrow(() -> new InfyLinkedInException("Post not found"));
 
-                /* ================= UPDATE CONTENT ================= */
                 post.setContent(dto.getContent());
                 post.setUpdatedAt(LocalDateTime.now());
 
-                /* ================= UPDATE HASHTAGS ================= */
                 if (dto.getHashtags() != null) {
 
                         Set<Hashtag> updatedHashtags = dto.getHashtags().stream()
@@ -126,34 +123,24 @@ public class PostServiceImpl implements PostService {
                                                                                         .build())))
                                         .collect(Collectors.toSet());
 
-                        /*
-                         * IMPORTANT:
-                         * - This clears only the JOIN TABLE (post_hashtags)
-                         * - DOES NOT delete hashtag records
-                         */
                         post.getHashtags().clear();
                         post.getHashtags().addAll(updatedHashtags);
                 }
 
-                /* ================= UPDATE MENTIONS ================= */
                 if (dto.getMentionedUserIds() != null) {
 
-                        // Existing mentioned user IDs
                         Set<Long> existingMentionedUserIds = post.getMentions().stream()
                                         .map(PostMention::getMentionedUserId)
                                         .collect(Collectors.toSet());
 
-                        // New mentions only
                         List<Long> newMentions = dto.getMentionedUserIds().stream()
                                         .filter(id -> !existingMentionedUserIds.contains(id))
                                         .toList();
 
-                        // Remove mentions not present anymore
                         post.getMentions().removeIf(
                                         mention -> !dto.getMentionedUserIds()
                                                         .contains(mention.getMentionedUserId()));
 
-                        // Add new mentions + notifications
                         newMentions.forEach(userId -> {
 
                                 Notification notification = Notification.builder()
@@ -174,8 +161,6 @@ public class PostServiceImpl implements PostService {
                 }
         }
 
-        /* ================= UPDATE STATUS ================= */
-
         @Override
         @Transactional
         public void updatePostStatus(Long postId, PostStatusUpdateDTO dto) {
@@ -192,8 +177,6 @@ public class PostServiceImpl implements PostService {
                 post.setScheduledAt(dto.getScheduledAt());
                 post.setUpdatedAt(LocalDateTime.now());
         }
-
-        /* ================= READ OPERATIONS ================= */
 
         @Override
         public List<PostResponseDTO> getAllPosts() {
@@ -223,11 +206,9 @@ public class PostServiceImpl implements PostService {
                                 .toList();
         }
 
-        /* ================= MAPPER ================= */
-
         private PostResponseDTO mapToResponse(Post post) {
                 PostResponseDTO dto = modelMapper.map(post, PostResponseDTO.class);
-                dto.setUser(userClient.getUsersById(post.getUserId()));
+                dto.setUser(userClient.getUserDetailsById(post.getUserId()));
                 dto.setHashtags(
                                 post.getHashtags() == null ? Set.of()
                                                 : post.getHashtags().stream()
@@ -238,7 +219,7 @@ public class PostServiceImpl implements PostService {
                         List<Long> mentionedUserIds = post.getMentions().stream()
                                         .map(PostMention::getMentionedUserId)
                                         .toList();
-                        List<UserResponseDTO> mentionedUsers = userClient.getUsersByIds(mentionedUserIds);
+                        List<UserDetailsDTO> mentionedUsers = userClient.getUsersDetailsByIds(mentionedUserIds);
                         dto.setMentionedUser(mentionedUsers);
                 } else {
                         dto.setMentionedUser(Collections.emptyList());
@@ -254,12 +235,73 @@ public class PostServiceImpl implements PostService {
                 Post post = postRepository.findById(postId)
                                 .orElseThrow(() -> new InfyLinkedInException("Post not found"));
                 post.getHashtags().clear();
-                /*
-                 * CascadeType.ALL + orphanRemoval = true ensures:
-                 * - post_mentions deleted
-                 * - post_interactions deleted
-                 * - post_hashtags join table cleaned automatically
-                 */
+               
                 postRepository.delete(post);
+        }
+
+        @Override
+        public PostCountDTO getPostCount(Long userId) {
+                userClient.validateUserExists(userId);
+
+                Long totalPostCount = postRepository.countByUserId(userId);
+                Long publishedCount = postRepository.countByUserIdAndStatus(userId, PostStatus.PUBLISHED);
+                Long draftCount = postRepository.countByUserIdAndStatus(userId, PostStatus.DRAFT);
+
+                return new PostCountDTO(
+                        userId,
+                        totalPostCount != null ? totalPostCount : 0L,
+                        publishedCount != null ? publishedCount : 0L,
+                        draftCount != null ? draftCount : 0L
+                );
+        }
+
+        @Override
+        public UserStatsDTO getUserStats(Long userId) {
+                userClient.validateUserExists(userId);
+
+                Long totalPostCount = postRepository.countByUserId(userId);
+                Long publishedCount = postRepository.countByUserIdAndStatus(userId, PostStatus.PUBLISHED);
+                Long draftCount = postRepository.countByUserIdAndStatus(userId, PostStatus.DRAFT);
+
+                var connectionData = networkClient.getConnectionCount(userId);
+
+                return new UserStatsDTO(
+                        userId,
+                        connectionData.getConnectionCount() != null ? connectionData.getConnectionCount() : 0L,
+                        connectionData.getPendingRequestCount() != null ? connectionData.getPendingRequestCount() : 0L,
+                        totalPostCount != null ? totalPostCount : 0L,
+                        publishedCount != null ? publishedCount : 0L,
+                        draftCount != null ? draftCount : 0L
+                );
+        }
+
+        @Override
+        public List<PostResponseDTO> getConnectedUsersPosts(Long userId) {
+                userClient.validateUserExists(userId);
+
+                List<Long> connectedUserIds = networkClient.getConnectedUserIds(userId);
+
+                if (connectedUserIds == null || connectedUserIds.isEmpty()) {
+                        return Collections.emptyList();
+                }
+
+                List<PostResponseDTO> connectedUsersPosts = new java.util.ArrayList<>();
+
+                for (Long connectedUserId : connectedUserIds) {
+                        List<Post> userPosts = postRepository.findByUserIdAndStatus(connectedUserId, PostStatus.PUBLISHED);
+
+                        userPosts.stream()
+                                .map(post -> {
+                                        PostResponseDTO postDTO = modelMapper.map(post, PostResponseDTO.class);
+                                        UserDetailsDTO userDTO = userClient.getUserDetailsById(post.getUserId());
+                                        postDTO.setUser(userDTO);
+                                        return postDTO;
+                                })
+                                .forEach(connectedUsersPosts::add);
+                }
+
+                connectedUsersPosts.sort((p1, p2) -> p2.getCreatedAt().compareTo(p1.getCreatedAt()));
+
+                return connectedUsersPosts;
         }
 }

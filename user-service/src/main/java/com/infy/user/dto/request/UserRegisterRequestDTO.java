@@ -1,12 +1,5 @@
 package com.infy.user.dto.request;
 
-import java.util.List;
-
-import com.infy.user.dto.EducationDTO;
-import com.infy.user.dto.UserExperienceDTO;
-import com.infy.user.dto.UserProfileDTO;
-import com.infy.user.dto.UserSkillDTO;
-
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -15,31 +8,26 @@ import lombok.Data;
 @Data
 public class UserRegisterRequestDTO {
 
-    @NotBlank
-    @Pattern(regexp = "^[A-Z][a-zA-Z]*$")
+    @NotBlank(message = "{user.firstName.notblank}")
+    @Pattern(regexp = "^[A-Z][a-zA-Z]*$", message = "{user.firstName.pattern}")
     private String firstName;
 
-    @NotBlank
-    @Pattern(regexp = "^[A-Z][a-zA-Z]*$")
+    @NotBlank(message = "{user.lastName.notblank}")
+    @Pattern(regexp = "^[A-Z][a-zA-Z]*$", message = "{user.lastName.pattern}")
     private String lastName;
 
-    @NotBlank
-    @Email(message = "Invalid email format")
+    @NotBlank(message = "{user.emailId.notblank}")
+    @Email(message = "{user.emailId.email}")
     private String emailId;
 
-    @NotBlank
+    @NotBlank(message = "{user.password.notblank}")
     @Pattern(
-      regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).{8,16}$"
+      regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).{8,16}$",
+      message = "{user.password.pattern}"
     )
     private String password;
 
-    @NotBlank
-    @Pattern(regexp = "^[6-9]\\d{9}$")
+    @NotBlank(message = "{user.mobileNo.notblank}")
+    @Pattern(regexp = "^[6-9]\\d{9}$", message = "{user.mobileNo.pattern}")
     private String mobileNo;
-
-    // Optional
-    private UserProfileDTO profile;
-    private List<EducationDTO> educations;
-    private List<UserExperienceDTO> experiences;
-    private List<UserSkillDTO> userSkills;
 }

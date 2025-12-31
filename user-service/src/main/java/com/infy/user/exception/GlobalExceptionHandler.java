@@ -17,6 +17,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse> handleBusinessException(InfyLinkedInException ex) {
         return ResponseEntity.badRequest().body(new ApiResponse("error", ex.getMessage()));
     }
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiResponse> handelException(Exception ex) {
+        return ResponseEntity.badRequest().body(new ApiResponse("error", ex.getMessage()));
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationException(

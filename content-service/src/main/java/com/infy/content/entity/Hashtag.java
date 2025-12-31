@@ -36,10 +36,6 @@ public class Hashtag {
     @Column(nullable = false)
     private String name;
 
-    /* ================= Relationships ================= */
-
     @ManyToMany(mappedBy = "hashtags", fetch = FetchType.LAZY)
     private Set<Post> posts;
 }
-
-

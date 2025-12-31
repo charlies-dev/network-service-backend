@@ -9,7 +9,7 @@ import lombok.Data;
 @Data
 public class PostUpdateRequestDTO {
 
-    @NotBlank
+    @NotBlank(message = "{post.update.content.notblank}")
     private String content;
 
     private Set<String> hashtags;
